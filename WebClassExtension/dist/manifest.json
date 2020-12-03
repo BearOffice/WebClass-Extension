@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "name": "WebClass Extension",
+    "description": "An extension for WebClass",
+    "homepage_url": "https://github.com",
+    "version": "0.1",
+    "icons": {
+        "128": "img/icon.png"
+    },
+    "browser_action": {
+        "default_title": "Open WebClass"
+    },
+    "permissions": [
+        "tabs",
+        "storage",
+        "https://*/webclass/login.php/*"
+    ],
+    "options_ui": {
+        "page": "options.html",
+        "chrome_style": true
+    },
+    "background": {
+        "scripts": [
+            "js/background.js"
+        ],
+        "persistent": false
+    }
+}
