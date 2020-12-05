@@ -36,8 +36,7 @@
         {
             "matches": ["https://*/webclass/file_down.php*"],
             "js": ["js/autodownload.js"]
-        }
-        ,
+        },
         {
             "matches": ["https://*/webclass/informations.php*"],
             "js": ["js/autoreadinfo.js"]

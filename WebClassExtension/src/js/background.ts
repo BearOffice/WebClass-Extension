@@ -37,15 +37,18 @@ function getUrl() {
 chrome.runtime.onMessage.addListener((downloadmsg, sender) => {
     if (sender.tab?.url) {
         // Create Url
-        let regex = new RegExp('(.*?)/webclass/');
-        let urlpart = sender.tab.url.match(regex)?.[1];
-        let url = urlpart + downloadmsg.url;
+        let url = getDomain(sender.tab.url) + downloadmsg.url;
 
         // Get file's extension
-        regex = new RegExp('.*(\\..*)')
+        let regex = new RegExp('.*(\\..*)')
         let ext = downloadmsg.url.match(regex)?.[1];
         let filename = downloadmsg.filename + ext;
-        
+
         chrome.downloads.download({ url: url, filename: filename });
     }
 });
+
+function getDomain(url: string) {
+    let regex = new RegExp('(.*?)/webclass/');
+    return url.match(regex)?.[1];
+}

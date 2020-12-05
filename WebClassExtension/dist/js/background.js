@@ -32,17 +32,20 @@ function getUrl() {
 }
 // Execute the download request from contentsdownload.js
 chrome.runtime.onMessage.addListener(function (downloadmsg, sender) {
-    var _a, _b, _c;
+    var _a, _b;
     if ((_a = sender.tab) === null || _a === void 0 ? void 0 : _a.url) {
         // Create Url
-        var regex = new RegExp('(.*?)/webclass/');
-        var urlpart = (_b = sender.tab.url.match(regex)) === null || _b === void 0 ? void 0 : _b[1];
-        var url = urlpart + downloadmsg.url;
+        var url = getDomain(sender.tab.url) + downloadmsg.url;
         // Get file's extension
-        regex = new RegExp('.*(\\..*)');
-        var ext = (_c = downloadmsg.url.match(regex)) === null || _c === void 0 ? void 0 : _c[1];
+        var regex = new RegExp('.*(\\..*)');
+        var ext = (_b = downloadmsg.url.match(regex)) === null || _b === void 0 ? void 0 : _b[1];
         var filename = downloadmsg.filename + ext;
         chrome.downloads.download({ url: url, filename: filename });
     }
 });
+function getDomain(url) {
+    var _a;
+    var regex = new RegExp('(.*?)/webclass/');
+    return (_a = url.match(regex)) === null || _a === void 0 ? void 0 : _a[1];
+}
 //# sourceMappingURL=background.js.map
