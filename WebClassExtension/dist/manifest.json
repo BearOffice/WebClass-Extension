@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "WebClass Extension",
     "description": "An extension for WebClass",
-    "homepage_url": "https://github.com",
+    "homepage_url": "https://github.com/MisakiBear/WebClass-Extension",
     "version": "0.1",
     "icons": {
         "128": "img/icon.png"
@@ -13,6 +13,7 @@
     "permissions": [
         "tabs",
         "storage",
+        "downloads",
         "https://*/webclass/login.php/*"
     ],
     "options_ui": {
@@ -20,9 +21,26 @@
         "chrome_style": true
     },
     "background": {
-        "scripts": [
-            "js/background.js"
-        ],
+        "scripts": ["js/background.js"],
         "persistent": false
-    }
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://*/webclass/*"],
+            "js": ["js/jquery-3.5.1.min.js"]
+        },
+        {
+            "matches": ["https://*/webclass/txtbk_frame.php*"],
+            "js": ["js/contentsdownload.js"]
+        },
+        {
+            "matches": ["https://*/webclass/file_down.php*"],
+            "js": ["js/autodownload.js"]
+        }
+        ,
+        {
+            "matches": ["https://*/webclass/informations.php*"],
+            "js": ["js/autoreadinfo.js"]
+        }
+    ]
 }

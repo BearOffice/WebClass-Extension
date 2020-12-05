@@ -1,1 +1,1 @@
-{"version":3,"file":"autologin.js","sourceRoot":"","sources":["../../src/js/autologin.ts"],"names":[],"mappings":";AAAA,CAAC,CAAC,QAAQ,CAAC,CAAC,KAAK,CAAC;IACd,IAAI,OAAO,GAAG,yHAAyH;UACjI,wFAAwF;UACxF,uCAAuC,CAAC;IAE9C,CAAC,CAAC,MAAM,CAAC,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC;AAC9B,CAAC,CAAC,CAAC"}
+{"version":3,"file":"autologin.js","sourceRoot":"","sources":["../../src/js/autologin.ts"],"names":[],"mappings":";AAAA,CAAC,CAAC;IACE,IAAI,OAAO,GAAG,yHAAyH;UACjI,wFAAwF;UACxF,uCAAuC,CAAC;IAE9C,CAAC,CAAC,MAAM,CAAC,CAAC,MAAM,CAAC,OAAO,CAAC,CAAC;AAC9B,CAAC,CAAC,CAAC"}

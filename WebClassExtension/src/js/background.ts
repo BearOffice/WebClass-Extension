@@ -1,6 +1,6 @@
 // Initialize
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+    //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
 });
 
 // Popup
@@ -28,7 +28,24 @@ function getUrl() {
             if (result != null)
                 resolve(url);
             else
-                resolve('https://github.com/MisakiBear');
+                resolve('https://github.com/MisakiBear/WebClass-Extension');
         });
     });
 }
+
+// Execute the download request from contentsdownload.js
+chrome.runtime.onMessage.addListener((downloadmsg, sender) => {
+    if (sender.tab?.url) {
+        // Create Url
+        let regex = new RegExp('(.*?)/webclass/');
+        let urlpart = sender.tab.url.match(regex)?.[1];
+        let url = urlpart + downloadmsg.url;
+
+        // Get file's extension
+        regex = new RegExp('.*(\\..*)')
+        let ext = downloadmsg.url.match(regex)?.[1];
+        let filename = downloadmsg.filename + ext;
+        
+        chrome.downloads.download({ url: url, filename: filename });
+    }
+});
