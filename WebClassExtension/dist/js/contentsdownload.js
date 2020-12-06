@@ -13,7 +13,7 @@ window.onload = function () {
     naviframe.find('#downloadbtn').on('click', function () {
         // The forth frame's first frame contains file's url
         var contentsframe = $('frame[name="webclass_content"]').contents().find('frame');
-        if (contentsframe) {
+        if (contentsframe.length != 0) {
             var framebody = $('body', contentsframe.contents());
             var fileurl = framebody.find('a').attr('href');
             chrome.runtime.sendMessage({ type: 'download', filename: chaptername, url: fileurl });
