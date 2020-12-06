@@ -1,7 +1,7 @@
 "use strict";
 // Initialize
 chrome.runtime.onInstalled.addListener(function () {
-    //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+    chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
 });
 // Listen request
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
@@ -26,18 +26,17 @@ chrome.browserAction.onClicked.addListener(function () {
         });
     });
 });
-// Inject js to login page
 function injectJs(tabId) {
     chrome.tabs.executeScript(tabId, { file: "js/jquery-3.5.1.min.js" });
     chrome.tabs.executeScript(tabId, { file: "js/autologin.js" });
 }
-// Get url asynchronously
 function getLoginUrl() {
+    // Get url synchronously
     return new Promise(function (resolve) {
         chrome.storage.sync.get(function (item) {
             var url = item.url;
-            var result = url.match('/webclass/login.php');
-            if (result != null)
+            var match = url.match('/webclass/login.php');
+            if (match != null)
                 resolve(url);
             else
                 resolve('https://github.com/MisakiBear/WebClass-Extension');
@@ -49,7 +48,7 @@ function downloadfile(downloadmsg, sender) {
     var _a, _b;
     if ((_a = sender.tab) === null || _a === void 0 ? void 0 : _a.url) {
         // Create Url
-        var url = getDomain(sender.tab.url) + downloadmsg.url;
+        var url = getWebClassDomain(sender.tab.url) + downloadmsg.url;
         // Get file's extension
         var regex = new RegExp('.*(\\..*)');
         var ext = (_b = downloadmsg.url.match(regex)) === null || _b === void 0 ? void 0 : _b[1];
@@ -57,7 +56,7 @@ function downloadfile(downloadmsg, sender) {
         chrome.downloads.download({ url: url, filename: filename });
     }
 }
-function getDomain(url) {
+function getWebClassDomain(url) {
     var _a;
     var regex = new RegExp('(.*?)/webclass/');
     return (_a = url.match(regex)) === null || _a === void 0 ? void 0 : _a[1];

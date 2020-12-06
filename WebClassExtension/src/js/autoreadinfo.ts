@@ -4,11 +4,10 @@ $('#rbtn').on('click', () => {
     let inject = '';
     let number = 0;
 
-    // Open every url 
     $('.info-list a').each((_, htmlelem) => {
         let href = $(htmlelem).attr('href');
         if (href) {
-            // Create a invisible temp container
+            // Create an invisible temp container
             inject += '<iframe class="ext" style="visibility:hidden;width:0;height:0;border:none;" ' +
                 'src="'+ href + '"></iframe>';
             number++;

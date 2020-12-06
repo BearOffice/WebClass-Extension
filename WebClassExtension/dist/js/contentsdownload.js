@@ -5,11 +5,9 @@ window.onload = function () {
     var chaptername = $('frame[name="webclass_tool"]').contents().find('h2').text();
     // The first frame contains navi bar
     var naviframe = $('frame[name="webclass_title"]').contents().find('#ContentQuitMenu');
-    // Inject download button
-    naviframe.append('<style>li{margin-right:15%}</style>' +
-        '<li><font color="black">WebClass Extensionからこのページのファイル(PDFなど)を' +
+    naviframe.append('<li ><font color="black">| このページの<b>ファイル(PDFなど)</b>を' +
         '<input type="button" id="downloadbtn" value="ダウンロード" class="btn btn-default"></font></li>');
-    // Regist onclick event        // Option:DOMSubtreeModified propertychange
+    // Regist onclick event   [Option:DOMSubtreeModified propertychange]
     naviframe.find('#downloadbtn').on('click', function () {
         // The forth frame's first frame contains file's url
         var contentsframe = $('frame[name="webclass_content"]').contents().find('frame');

@@ -3,11 +3,10 @@ $('.pager').append('<li>このページのすべてのお知らせを<input type
 $('#rbtn').on('click', function () {
     var inject = '';
     var number = 0;
-    // Open every url 
     $('.info-list a').each(function (_, htmlelem) {
         var href = $(htmlelem).attr('href');
         if (href) {
-            // Create a invisible temp container
+            // Create an invisible temp container
             inject += '<iframe class="ext" style="visibility:hidden;width:0;height:0;border:none;" ' +
                 'src="' + href + '"></iframe>';
             number++;

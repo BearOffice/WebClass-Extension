@@ -1,52 +1,44 @@
 $(window).on('load', () => {
     chrome.runtime.sendMessage({ type: 'hasreport' }, response => {
         if (response.has == true) {
-        runReportAlert();
+            runReportAlert();
         }
     });
 });
 
-function getDomainUrl() {
-    let url = location.href;
-    let regex = new RegExp('(.*?)/webclass/.*');
-    let domainurl = url.match(regex)?.[1];
-    return domainurl;
-}
-
 function getMailUrl() {
-    return getDomainUrl() + '/webclass/msg_editor.php?msgappmode=inbox';
+    return getWebClassDomain(location.href) + '/webclass/msg_editor.php?msgappmode=inbox';
 }
 
-//$('tbody a').attr('href')
 function runReportAlert() {
-    // Create mail frame
+    // Create an invisible temp container
     $('body').append('<iframe class="extmail" style="visibility:hidden;width:0;height:0;border:none;" ' +
         'src="' + getMailUrl() + '"></iframe>');
 
+    // Limit load event's run times
     let onetime = true;
     $('.extmail').on('load', () => {
-        // limit load event's run times
+        // The second load event is fired by ('input[name="UNSET_UNREADFLAG"]').trigger("click")
         if (onetime == false) {
             $('.extmail').remove();
             $('.extmail').off();
 
-            embedReport();
-
+            embedMessage();
             return;
         }
         onetime = false;
 
         let mailframe = $('.extmail').contents();
 
-        // Check Content
         let result = checkMainContents();
         if (result == false) {
             $('.extmail').remove();
             $('.extmail').off();
-            alert('レポートがうまく提出されていないようです．');
+            alert('レポートがうまく提出されていないようです．ご確認ください．');
             return;
         }
 
+        // Read the first mail
         mailframe.find('input[name="id[0]"]').trigger("click");
         mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
     });
@@ -54,37 +46,37 @@ function runReportAlert() {
 
 function checkMainContents() {
     let mailframe = $('.extmail').contents();
-    let count = 0;
-    let title = '';
-    let datetime = '';
-    mailframe.find('#MsgListTable td[nowrap]').slice(2, 5).each((_, htmlelem) => {
-        let contents = $('span', htmlelem).text();
-        if (count == 0) title = contents;
-        else if (count == 2) datetime = contents;
-        count++;
-    });
+
+    let htmlelem = mailframe.find('#MsgListTable td[nowrap]').eq(2);
+    let title = $('span', htmlelem).text();
 
     // Check title
     if (title.match(/レポートを受け取りました/) == null) return false;
 
-    // Check time
-    let date = Date.parse('20' + datetime + ':00');  // While datetime's format is '20/10/12 09:30'
-    if ((Date.now() - date) / (1000 * 60) > 2) return false;
+    // [Deprecated] Check time
+    //let date = Date.parse('20' + datetime + ':00');  // While datetime's format is '20/10/12 09:30'
+    //if ((Date.now() - date) / (1000 * 60) > 3) return false;
+
+    // Check unread
+    let value = $('#js-unread-message-count').text();
+    if (value == '') return false;
 
     return true;
 }
 
 function changeUnreadPop() {
+    // The value of unread-message popup
     let value = $('#js-unread-message-count').text();
     let count = parseInt(value) - 1;
     if (count <= 0)
         value = "";
     else
         value = count.toString();
+
     $('#js-unread-message-count').text(value);
 }
 
-function embedReport() {
+function embedMessage() {
     changeUnreadPop();
 
     $('#top-info').empty();
@@ -94,17 +86,19 @@ function embedReport() {
         let fileurl = rtuple[0];
         let filename = rtuple[1];
         $('#top-info').append('<div class="container"><div class="alert alert-info">' +
-            '<p>レポートがうまく提出できたようです．提出したレポートのファイル名は：<b>' + filename + '</b>です．</p>' +
+            '<p>レポートがうまく提出できたようです．提出したレポートのファイル名は<b>' + filename + '</b>です．</p>' +
             '<p>ファイルを<input type="button" id="downloadbtn" value="ダウンロード" class="btn btn-default" ' +
             'onclick="location.href=\'' + fileurl + '\'">し，内容を確認できます．</p></div></div>');
     });
 }
 
 function getReportUrl() {
+    // Get report's url synchronously
     return new Promise(resolve => {
         let regex = new RegExp('(.*?/webclass/course.php/.*?/).*');
         let reportpageurl = location.href.match(regex)?.[1] + 'my-reports';
 
+        // Create an invisible temp container
         $('body').append('<iframe class="extrepo" style="visibility:hidden;width:0;height:0;border:none;" ' +
             'src="' + reportpageurl + '"></iframe>');
 
@@ -115,10 +109,11 @@ function getReportUrl() {
             $('.extrepo').remove();
             $('.extrepo').off();
 
-            let domain = getDomainUrl();
+            let domain = getWebClassDomain(location.href);
             if (fileurl != undefined && domain != undefined && filename != undefined)
-                resolve([getDomainUrl() + fileurl, filename]);
-            resolve(['', '']);
+                resolve([domain + fileurl, filename]);
+            else
+                resolve(['', '']);
         });
     });
 }

@@ -2,10 +2,15 @@
 // Save the record to storage
 function saveurl() {
     var value = $('#urltext').val();
-    chrome.storage.sync.set({ url: value });
-    $("#resultlb").text('設定が成功しました．');
+    var match = value.match('/webclass/login.php');
+    if (match == null) {
+        $("#resultlb").text('指定したリンクが無効です．');
+    }
+    else {
+        $("#resultlb").text('設定が成功しました．');
+        chrome.storage.sync.set({ url: value });
+    }
 }
-// Bind click event
 $('#confirmbtn').on('click', saveurl);
 // Initialize the record from storage
 chrome.storage.sync.get(function (item) {

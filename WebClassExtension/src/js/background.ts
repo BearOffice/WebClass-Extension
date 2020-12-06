@@ -1,6 +1,6 @@
 // Initialize
 chrome.runtime.onInstalled.addListener(() => {
-    //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+    chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
 });
 
 // Listen request
@@ -28,19 +28,18 @@ chrome.browserAction.onClicked.addListener(() => {
     });
 });
 
-// Inject js to login page
 function injectJs(tabId: number) {
     chrome.tabs.executeScript(tabId, { file: "js/jquery-3.5.1.min.js" });
     chrome.tabs.executeScript(tabId, { file: "js/autologin.js" });
 }
 
-// Get url asynchronously
 function getLoginUrl() {
+    // Get url synchronously
     return new Promise(resolve => {
         chrome.storage.sync.get(item => {
             let url = item.url as string
-            let result = url.match('/webclass/login.php');
-            if (result != null)
+            let match = url.match('/webclass/login.php');
+            if (match != null)
                 resolve(url);
             else
                 resolve('https://github.com/MisakiBear/WebClass-Extension');
@@ -52,7 +51,7 @@ function getLoginUrl() {
 function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
     if (sender.tab?.url) {
         // Create Url
-        let url = getDomain(sender.tab.url) + downloadmsg.url;
+        let url = getWebClassDomain(sender.tab.url) + downloadmsg.url;
 
         // Get file's extension
         let regex = new RegExp('.*(\\..*)')
@@ -63,7 +62,7 @@ function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
     }
 }
 
-function getDomain(url: string) {
+function getWebClassDomain(url: string) {
     let regex = new RegExp('(.*?)/webclass/');
     return url.match(regex)?.[1];
 }
