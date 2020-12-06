@@ -39,7 +39,16 @@
         },
         {
             "matches": ["https://*/webclass/informations.php*"],
+            "exclude_matches":["https://*/webclass/informations.php*action=show*"],
             "js": ["js/autoreadinfo.js"]
+        },
+        {
+            "matches": ["https://*/webclass/course.php*"],
+            "js": ["js/reportalert.js"]
+        },
+        {
+            "matches":["https://*/webclass/qstn_frame.php*"],
+            "js": ["js/reportsearcher.js"]
         }
     ]
 }

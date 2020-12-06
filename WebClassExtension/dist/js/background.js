@@ -3,9 +3,23 @@
 chrome.runtime.onInstalled.addListener(function () {
     //chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
 });
+// Listen request
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.type == 'download') {
+        downloadfile(request, sender);
+        sendResponse();
+    }
+    else if (request.type == 'report') {
+        changereportstatus();
+        sendResponse();
+    }
+    else if (request.type == 'hasreport') {
+        sendResponse({ has: reportstatus() });
+    }
+});
 // Popup
 chrome.browserAction.onClicked.addListener(function () {
-    getUrl().then(function (loginurl) {
+    getLoginUrl().then(function (loginurl) {
         chrome.tabs.create({ url: loginurl }, function (tab) {
             if (tab.id)
                 injectJs(tab.id);
@@ -18,7 +32,7 @@ function injectJs(tabId) {
     chrome.tabs.executeScript(tabId, { file: "js/autologin.js" });
 }
 // Get url asynchronously
-function getUrl() {
+function getLoginUrl() {
     return new Promise(function (resolve) {
         chrome.storage.sync.get(function (item) {
             var url = item.url;
@@ -31,7 +45,7 @@ function getUrl() {
     });
 }
 // Execute the download request from contentsdownload.js
-chrome.runtime.onMessage.addListener(function (downloadmsg, sender) {
+function downloadfile(downloadmsg, sender) {
     var _a, _b;
     if ((_a = sender.tab) === null || _a === void 0 ? void 0 : _a.url) {
         // Create Url
@@ -42,10 +56,24 @@ chrome.runtime.onMessage.addListener(function (downloadmsg, sender) {
         var filename = downloadmsg.filename + ext;
         chrome.downloads.download({ url: url, filename: filename });
     }
-});
+}
 function getDomain(url) {
     var _a;
     var regex = new RegExp('(.*?)/webclass/');
     return (_a = url.match(regex)) === null || _a === void 0 ? void 0 : _a[1];
+}
+// ------------- Report Alert -------------
+var hasreport = false;
+function changereportstatus() {
+    hasreport = true;
+}
+function reportstatus() {
+    if (hasreport == true) {
+        hasreport = false;
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 //# sourceMappingURL=background.js.map

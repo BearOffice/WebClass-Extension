@@ -1,13 +1,28 @@
 "use strict";
-// Create a temp container
-$("body").append('<p></p>');
-$('body p').hide();
-// Open every url 
-$('.info-list a').each(function (_, htmlelem) {
-    var href = $(htmlelem).attr('href');
-    if (href)
-        $('body p').load(href);
+$('.pager').append('<li>このページのすべてのお知らせを<input type="button" id="rbtn" value="既読にする"></li>');
+$('#rbtn').on('click', function () {
+    var inject = '';
+    var number = 0;
+    // Open every url 
+    $('.info-list a').each(function (_, htmlelem) {
+        var href = $(htmlelem).attr('href');
+        if (href) {
+            // Create a invisible temp container
+            inject += '<iframe class="ext" style="visibility:hidden;width:0;height:0;border:none;" ' +
+                'src="' + href + '"></iframe>';
+            number++;
+        }
+    });
+    $('body').append(inject);
+    // Make sure that all url have been opened
+    var count = 0;
+    $('.ext').on('load', function () {
+        count++;
+        if (count == number) {
+            $('.ext').remove();
+            $('.ext').off();
+            alert("このページのすべてのお知らせを既読にしました!");
+        }
+    });
 });
-$('body p').empty();
-alert('Succeeded!');
 //# sourceMappingURL=autoreadinfo.js.map

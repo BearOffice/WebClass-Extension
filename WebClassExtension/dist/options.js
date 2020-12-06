@@ -3,7 +3,7 @@
 function saveurl() {
     var value = $('#urltext').val();
     chrome.storage.sync.set({ url: value });
-    $("#resultlb").text('Saved successfully.');
+    $("#resultlb").text('設定が成功しました．');
 }
 // Bind click event
 $('#confirmbtn').on('click', saveurl);
