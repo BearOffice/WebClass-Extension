@@ -21,7 +21,7 @@
         "chrome_style": true
     },
     "background": {
-        "scripts": ["js/jquery-3.5.1.min.js","js/background.js"],
+        "scripts": ["js/background.js"],
         "persistent": false
     },
     "content_scripts": [
