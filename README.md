@@ -1,5 +1,5 @@
 # WebClass-Extension
- ウェブクラス拡張機能(Chrome専用)  
+ ウェブクラス拡張機能(Chrome専用)/ライセンスは2021年2月中に廃止する予定です．  
   
 # インストール
 　1. ソースコードの「/WebClassExtension/dist/」フォルダまたは右のReleasesからこの拡張機能をダウンロードします（Releasesからダウンロードした場合は解凍してください）．  
