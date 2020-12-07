@@ -3,7 +3,7 @@
     "name": "WebClass Extension",
     "description": "An extension for WebClass",
     "homepage_url": "https://github.com/MisakiBear/WebClass-Extension",
-    "version": "0.1",
+    "version": "0.2",
     "icons": {
         "128": "img/icon.png"
     },
@@ -21,13 +21,20 @@
         "chrome_style": true
     },
     "background": {
-        "scripts": ["js/background.js"],
+        "scripts": ["js/jquery-3.5.1.min.js","js/background.js"],
         "persistent": false
     },
     "content_scripts": [
         {
             "matches": ["https://*/webclass/*"],
             "js": ["js/jquery-3.5.1.min.js"]
+        },
+        {
+            "matches": ["https://*/webclass/", 
+                "https://*/webclass/?acs_=*", 
+                "https://*/webclass/index.php*"
+            ],
+            "js": ["js/mainpage.js"]
         },
         {
             "matches": ["https://*/webclass/txtbk_frame.php*"],
@@ -39,7 +46,7 @@
         },
         {
             "matches": ["https://*/webclass/informations.php*"],
-            "exclude_matches":["https://*/webclass/informations.php*action=show*"],
+            "exclude_matches": ["https://*/webclass/informations.php*action=show*"],
             "js": ["js/autoreadinfo.js"]
         },
         {
@@ -47,7 +54,7 @@
             "js": ["js/reportalert.js"]
         },
         {
-            "matches":["https://*/webclass/qstn_frame.php*"],
+            "matches": ["https://*/webclass/qstn_frame.php*"],
             "js": ["js/reportsearcher.js"]
         }
     ]

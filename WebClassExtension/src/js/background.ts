@@ -9,32 +9,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         downloadfile(request, sender);
         sendResponse();
     }
-    else if (request.type == 'report') {
-        changereportstatus();
+    else if (request.type == 'findreport') {
+        reportFinded();
         sendResponse();
     }
     else if (request.type == 'hasreport') {
-        sendResponse({ has: reportstatus() });
+        sendResponse({ has: hasReport() });
     }
-
 });
 
 // Popup
 chrome.browserAction.onClicked.addListener(() => {
     getLoginUrl().then(loginurl => {
         chrome.tabs.create({ url: loginurl as string }, tab => {
-            if (tab.id) injectJs(tab.id);
+            injectJs(tab);
         });
     });
 });
 
-function injectJs(tabId: number) {
-    chrome.tabs.executeScript(tabId, { file: "js/jquery-3.5.1.min.js" });
-    chrome.tabs.executeScript(tabId, { file: "js/autologin.js" });
+function injectJs(tab: chrome.tabs.Tab) {
+    if(tab.id){
+        chrome.tabs.executeScript(tab.id, { file: "js/jquery-3.5.1.min.js" });
+        chrome.tabs.executeScript(tab.id, { file: "js/autologin.js" });
+    }
 }
 
-function getLoginUrl() {
-    // Get url synchronously
+// Get url synchronously
+function getLoginUrl(): Promise<string> {
     return new Promise(resolve => {
         chrome.storage.sync.get(item => {
             let url = item.url as string
@@ -51,10 +52,11 @@ function getLoginUrl() {
 function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
     if (sender.tab?.url) {
         // Create Url
-        let url = getWebClassDomain(sender.tab.url) + downloadmsg.url;
+        let regex = new RegExp('(.*?)/webclass/');
+        let url = sender.tab.url.match(regex)?.[1] + downloadmsg.url;
 
         // Get file's extension
-        let regex = new RegExp('.*(\\..*)')
+        regex = new RegExp('.*(\\..*)')
         let ext = downloadmsg.url.match(regex)?.[1];
         let filename = downloadmsg.filename + ext;
 
@@ -62,20 +64,16 @@ function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
     }
 }
 
-function getWebClassDomain(url: string) {
-    let regex = new RegExp('(.*?)/webclass/');
-    return url.match(regex)?.[1];
-}
 
 // ------------- Report Alert -------------
 
 let hasreport = false;
 
-function changereportstatus() {
+function reportFinded() {
     hasreport = true;
 }
 
-function reportstatus() {
+function hasReport() {
     if (hasreport == true) {
         hasreport = false;
         return true;
