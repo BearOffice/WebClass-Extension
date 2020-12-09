@@ -23,6 +23,7 @@ $('#rbtn').on('click', () => {
             $('.ext').remove();
             $('.ext').off();
             alert("このページのすべてのお知らせを既読にしました!");
+            location.reload();
         }
     });
 });
