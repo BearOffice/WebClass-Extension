@@ -1,6 +1,12 @@
 // Initialize
 chrome.runtime.onInstalled.addListener(() => {
     chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+
+    // Prevent url not being set
+    chrome.storage.sync.get(item => {
+        if (item.url == undefined)
+            chrome.storage.sync.set({ url: '' });
+    });
 });
 
 // Listen request
@@ -21,14 +27,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Popup
 chrome.browserAction.onClicked.addListener(() => {
     getLoginUrl().then(loginurl => {
-        chrome.tabs.create({ url: loginurl as string }, tab => {
+        chrome.tabs.create({ url: loginurl }, tab => {
             injectJs(tab);
         });
     });
 });
 
 function injectJs(tab: chrome.tabs.Tab) {
-    if(tab.id){
+    if (tab.id) {
         chrome.tabs.executeScript(tab.id, { file: "js/jquery-3.5.1.min.js" });
         chrome.tabs.executeScript(tab.id, { file: "js/autologin.js" });
     }
@@ -38,7 +44,7 @@ function injectJs(tab: chrome.tabs.Tab) {
 function getLoginUrl(): Promise<string> {
     return new Promise(resolve => {
         chrome.storage.sync.get(item => {
-            let url = item.url as string
+            let url = item.url as string;
             let match = url.match('/webclass/login.php');
             if (match != null)
                 resolve(url);

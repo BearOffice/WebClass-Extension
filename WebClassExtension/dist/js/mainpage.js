@@ -13,7 +13,7 @@ function switchInfoboxVisibility() {
     }
     else {
         infobox.show();
-        title.text('管理者からのお知らせ　 > クリックして格納 <');
+        title.text('管理者からのお知らせ　 < クリックして格納 >');
     }
 }
 // Arrange the row

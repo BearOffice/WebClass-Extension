@@ -1,4 +1,4 @@
-// Find each file href except javascript
+// Find each file's url except javascript
 $('a').each((_, htmlelem) => {
     let href = $(htmlelem).attr('href');
     let match = href?.match('javascript:window.close();');

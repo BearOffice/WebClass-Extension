@@ -2,6 +2,11 @@
 // Initialize
 chrome.runtime.onInstalled.addListener(function () {
     chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+    // Prevent url not being set
+    chrome.storage.sync.get(function (item) {
+        if (item.url == undefined)
+            chrome.storage.sync.set({ url: '' });
+    });
 });
 // Listen request
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
