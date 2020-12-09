@@ -1,7 +1,12 @@
 let infobox = $('#NewestInformations');
 let title = $('#UserTopInfo .page-header');
-title.text('管理者からのお知らせ　 > クリックして展開 <');
-switchInfoboxVisibility();
+title.text('管理者からのお知らせ　 < クリックして格納 >');
+
+// Collapse when there are no unread notifications
+let value = $('#js-unread-message-count').text();
+if (value == '') {
+    switchInfoboxVisibility();
+}
 
 $('#UserTopInfo .page-header').on('click', () => {
     switchInfoboxVisibility();
