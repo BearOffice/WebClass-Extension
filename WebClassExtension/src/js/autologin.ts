@@ -4,7 +4,7 @@
 // and cause an infinite loop.
 // Sending message to background to assure this script only be injected one time will not work too.
 // chrome.runtime.sendMessage will also interrupt the login process.
-$(() => {
+$(window).on('load', () => {
     let loginjs = '<script>var autologin = $("<div class=\'loginFeedback\'><p>自動ログイン中です。 <img src=\'./images/loading.gif\' /></p></div>");'
         + '$.overlay({object: autologin}); $.showOverlay({ speed: 150, callback: function(){} });'
         + 'setTimeout(function(){$(document.login).trigger("submit")},200);<\/script>';

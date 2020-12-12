@@ -41,9 +41,7 @@ function runReportAlert() {
             // Read the first mail
             let mailframe = $('.extmail').contents();
             mailframe.find('input[name="id[0]"]').trigger("click");
-            setTimeout(() => {
-                mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
-            }, 30);
+            mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
 
             embedMessage();
         });

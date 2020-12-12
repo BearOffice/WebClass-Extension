@@ -74,9 +74,7 @@ function runReportAlert() {
             // Read the first mail
             var mailframe = $('.extmail').contents();
             mailframe.find('input[name="id[0]"]').trigger("click");
-            setTimeout(function () {
-                mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
-            }, 30);
+            mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
             embedMessage();
         });
     });
