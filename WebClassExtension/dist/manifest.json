@@ -3,7 +3,7 @@
     "name": "WebClass Extension",
     "description": "An extension for WebClass",
     "homepage_url": "https://github.com/MisakiBear/WebClass-Extension",
-    "version": "0.4",
+    "version": "0.5",
     "icons": {
         "128": "img/icon.png"
     },
@@ -52,13 +52,11 @@
         },
         {
             "matches": ["https://*/webclass/course.php*"],
-            "js": ["js/reportalert.js"],
-            "run_at": "document_end"
+            "js": ["js/reportalert.js"]
         },
         {
             "matches": ["https://*/webclass/qstn_frame.php*"],
-            "js": ["js/reportsearcher.js"],
-            "run_at": "document_end"
+            "js": ["js/reportsearcher.js"]
         }
     ]
 }

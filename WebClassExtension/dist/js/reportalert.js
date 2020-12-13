@@ -39,7 +39,7 @@ var reportName = '';
 var reportUrl = '';
 var reportTime = '';
 $(window).on('load', function () {
-    chrome.runtime.sendMessage({ type: 'hasreport' }, function (response) {
+    chrome.runtime.sendMessage({ type: 'reportstatus' }, function (response) {
         if (response.has == true)
             runReportAlert();
     });
@@ -61,6 +61,8 @@ function runReportAlert() {
         if (onetime == false) {
             $('.extmail').remove();
             $('.extmail').off();
+            // Finished sign
+            chrome.runtime.sendMessage({ type: 'reportdone' });
             return;
         }
         onetime = false;
@@ -74,7 +76,9 @@ function runReportAlert() {
             // Read the first mail
             var mailframe = $('.extmail').contents();
             mailframe.find('input[name="id[0]"]').trigger("click");
-            mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
+            setTimeout(function () {
+                mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
+            }, 20);
             embedMessage();
         });
     });

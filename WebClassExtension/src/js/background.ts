@@ -15,12 +15,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         downloadfile(request, sender);
         sendResponse();
     }
-    else if (request.type == 'findreport') {
-        reportFinded();
+    else if (request.type == 'reportfinded') {
+        clearTimeCheck()
+        reportStatus(true);
         sendResponse();
     }
-    else if (request.type == 'hasreport') {
+    else if (request.type == 'reportstatus') {
+        timeCheck();
         sendResponse({ has: hasReport() });
+    }
+    else if (request.type == 'reportdone') {
+        clearTimeCheck();
+        reportStatus(false);
+        sendResponse();
     }
 });
 
@@ -74,16 +81,28 @@ function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
 // ------------- Report Alert -------------
 
 let hasreport = false;
+let check: NodeJS.Timeout;
+let single = true;
 
-function reportFinded() {
-    hasreport = true;
+function reportStatus(status: boolean) {
+    hasreport = status;
 }
 
 function hasReport() {
-    if (hasreport == true) {
-        hasreport = false;
-        return true;
-    } else {
-        return false;
-    }
+    return hasreport;
+}
+
+function timeCheck() {
+    // Limit timecheck
+    if (single == false) return;
+    single = false;
+    check = setTimeout(() => {
+        reportStatus(false);
+        single = true;
+    }, 5000);
+}
+
+function clearTimeCheck() {
+    clearTimeout(check);
+    single = true;
 }

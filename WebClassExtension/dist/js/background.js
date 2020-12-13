@@ -14,12 +14,19 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         downloadfile(request, sender);
         sendResponse();
     }
-    else if (request.type == 'findreport') {
-        reportFinded();
+    else if (request.type == 'reportfinded') {
+        clearTimeCheck();
+        reportStatus(true);
         sendResponse();
     }
-    else if (request.type == 'hasreport') {
+    else if (request.type == 'reportstatus') {
+        timeCheck();
         sendResponse({ has: hasReport() });
+    }
+    else if (request.type == 'reportdone') {
+        clearTimeCheck();
+        reportStatus(false);
+        sendResponse();
     }
 });
 // Popup
@@ -65,16 +72,26 @@ function downloadfile(downloadmsg, sender) {
 }
 // ------------- Report Alert -------------
 var hasreport = false;
-function reportFinded() {
-    hasreport = true;
+var check;
+var single = true;
+function reportStatus(status) {
+    hasreport = status;
 }
 function hasReport() {
-    if (hasreport == true) {
-        hasreport = false;
-        return true;
-    }
-    else {
-        return false;
-    }
+    return hasreport;
+}
+function timeCheck() {
+    // Limit timecheck
+    if (single == false)
+        return;
+    single = false;
+    check = setTimeout(function () {
+        reportStatus(false);
+        single = true;
+    }, 5000);
+}
+function clearTimeCheck() {
+    clearTimeout(check);
+    single = true;
 }
 //# sourceMappingURL=background.js.map

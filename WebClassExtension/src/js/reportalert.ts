@@ -3,7 +3,7 @@ let reportUrl = '';
 let reportTime = '';
 
 $(window).on('load', () => {
-    chrome.runtime.sendMessage({ type: 'hasreport' }, response => {
+    chrome.runtime.sendMessage({ type: 'reportstatus' }, response => {
         if (response.has == true) runReportAlert();
     });
 });
@@ -26,6 +26,10 @@ function runReportAlert() {
         if (onetime == false) {
             $('.extmail').remove();
             $('.extmail').off();
+
+            // Finished sign
+            chrome.runtime.sendMessage({ type: 'reportdone' });
+
             return;
         }
         onetime = false;
@@ -41,7 +45,9 @@ function runReportAlert() {
             // Read the first mail
             let mailframe = $('.extmail').contents();
             mailframe.find('input[name="id[0]"]').trigger("click");
-            mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
+            setTimeout(() => {
+                mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
+            }, 20);
 
             embedMessage();
         });
