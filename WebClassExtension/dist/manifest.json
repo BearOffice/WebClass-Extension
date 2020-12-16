@@ -3,7 +3,7 @@
     "name": "WebClass Extension",
     "description": "An extension for WebClass",
     "homepage_url": "https://github.com/MisakiBear/WebClass-Extension",
-    "version": "0.5",
+    "version": "0.5.1",
     "icons": {
         "128": "img/icon.png"
     },
