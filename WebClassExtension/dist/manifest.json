@@ -21,7 +21,7 @@
         "chrome_style": true
     },
     "background": {
-        "scripts": ["js/background.js"],
+        "scripts": ["js/timetrigger.js", "js/background.js"],
         "persistent": false
     },
     "content_scripts": [
@@ -52,7 +52,7 @@
         },
         {
             "matches": ["https://*/webclass/course.php*"],
-            "js": ["js/reportalert.js"]
+            "js": ["js/timetrigger.js", "js/reportalert.js"]
         },
         {
             "matches": ["https://*/webclass/qstn_frame.php*"],

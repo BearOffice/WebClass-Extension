@@ -77,12 +77,9 @@ function downloadfile(downloadmsg: any, sender: chrome.runtime.MessageSender) {
     }
 }
 
-
 // ------------- Report Alert -------------
-
 let hasreport = false;
-let check: NodeJS.Timeout;
-let single = true;
+let repotrigger = new TimeTrigger(5000);
 
 function reportStatus(status: boolean) {
     hasreport = status;
@@ -93,16 +90,9 @@ function hasReport() {
 }
 
 function timeCheck() {
-    // Limit timecheck
-    if (single == false) return;
-    single = false;
-    check = setTimeout(() => {
-        reportStatus(false);
-        single = true;
-    }, 5000);
+    repotrigger.timeCheck(() => { reportStatus(false); });
 }
 
 function clearTimeCheck() {
-    clearTimeout(check);
-    single = true;
+    repotrigger.clearTimeCheck();
 }

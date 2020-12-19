@@ -2,12 +2,18 @@ let infobox = $('#NewestInformations');
 let title = $('#UserTopInfo .page-header');
 title.text('管理者からのお知らせ　 < クリックして格納 >');
 
-// Collapse when there are no unread notifications
+// Collapse the notifications
+switchInfoboxVisibility();
+
+// Append the notifications if there are any unread messages
 $(window).on('load', () => {
-    let value = $('#js-unread-message-count').text();
-    if (value == '') {
-        switchInfoboxVisibility();
-    }
+    // js-unread-message-count is updated by ajax, can't catch the updated timing
+    setTimeout(() => {
+        let value = $('#js-unread-message-count').text();
+        if (value != '') {
+            switchInfoboxVisibility();
+        }
+    }, 200);
 });
 
 $('#UserTopInfo .page-header').on('click', () => {
@@ -38,4 +44,3 @@ $('.course-webclass').html('WebClass&nbsp;&nbsp;' + egg[Math.floor(Math.random()
 //$('.container .row').prepend('<div id="UserTopInfo"><h4 class="page-header"></h4>' +
 //    '<iframe class="extinfo" style="width:100%;height:300;border:none;" ' +
 //    'src=""></iframe></div>');
-

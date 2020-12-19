@@ -72,8 +72,7 @@ function downloadfile(downloadmsg, sender) {
 }
 // ------------- Report Alert -------------
 var hasreport = false;
-var check;
-var single = true;
+var repotrigger = new TimeTrigger(5000);
 function reportStatus(status) {
     hasreport = status;
 }
@@ -81,17 +80,9 @@ function hasReport() {
     return hasreport;
 }
 function timeCheck() {
-    // Limit timecheck
-    if (single == false)
-        return;
-    single = false;
-    check = setTimeout(function () {
-        reportStatus(false);
-        single = true;
-    }, 5000);
+    repotrigger.timeCheck(function () { reportStatus(false); });
 }
 function clearTimeCheck() {
-    clearTimeout(check);
-    single = true;
+    repotrigger.clearTimeCheck();
 }
 //# sourceMappingURL=background.js.map

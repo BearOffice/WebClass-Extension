@@ -41,54 +41,77 @@ var reportTime = '';
 $(window).on('load', function () {
     chrome.runtime.sendMessage({ type: 'reportstatus' }, function (response) {
         if (response.has == true)
-            runReportAlert();
+            reportAlert();
     });
 });
-function getMailUrl() {
-    var _a;
-    var regex = new RegExp('(.*?)/webclass/');
-    return ((_a = location.href.match(regex)) === null || _a === void 0 ? void 0 : _a[1]) + '/webclass/msg_editor.php?msgappmode=inbox';
-}
-function runReportAlert() {
-    // Create an invisible temp container
-    $('body').append('<iframe class="extmail" style="visibility:hidden;width:0;height:0;border:none;" ' +
-        'src="' + getMailUrl() + '"></iframe>');
-    // Limit load event's run times
-    var onetime = true;
-    $('.extmail').on('load', function () {
-        // The second load event is fired by ('input[name="UNSET_UNREADFLAG"]').trigger("click")
-        // This means the operation is successful.
-        if (onetime == false) {
-            $('.extmail').remove();
-            $('.extmail').off();
-            // Finished sign
-            chrome.runtime.sendMessage({ type: 'reportdone' });
-            return;
-        }
-        onetime = false;
-        checkReport().then(function (result) {
-            if (result == false) {
-                $('.extmail').remove();
-                $('.extmail').off();
-                alert('レポートが提出されていないようです．「成績」➝「レポート」からもう一度確認してください．');
-                return;
+function reportAlert() {
+    return __awaiter(this, void 0, void 0, function () {
+        var errtrigger, onetime;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    errtrigger = new TimeTrigger(3000);
+                    return [4 /*yield*/, monitorLoadingStatus()];
+                case 1:
+                    // Monitor if the infobox exists
+                    if ((_a.sent()) == true) {
+                        loadingMessage();
+                    }
+                    else {
+                        if (lightCheck() == false) {
+                            warningMessage();
+                            return [2 /*return*/];
+                        }
+                    }
+                    // Pull error trigger
+                    errtrigger.timeCheck(errorMessage);
+                    // Create an invisible temp container for reading mail contents
+                    $('body').append('<iframe class="extmail" style="visibility:hidden;width:0;height:0;border:none;" ' +
+                        'src="' + getMailUrl() + '"></iframe>');
+                    onetime = true;
+                    $('.extmail').on('load', function () {
+                        // The second load event is fired by ('input[name="UNSET_UNREADFLAG"]').trigger("click")
+                        // This means the operation is successful.
+                        if (onetime == false) {
+                            $('.extmail').remove();
+                            $('.extmail').off();
+                            // Finished sign
+                            chrome.runtime.sendMessage({ type: 'reportdone' });
+                            return;
+                        }
+                        onetime = false;
+                        DeepCheck().then(function (result) {
+                            if (result == false) {
+                                $('.extmail').remove();
+                                $('.extmail').off();
+                                errtrigger.clearTimeCheck();
+                                warningMessage();
+                                return;
+                            }
+                            readMail();
+                            errtrigger.clearTimeCheck();
+                            reportDetailMessage();
+                        });
+                    });
+                    return [2 /*return*/];
             }
-            // Read the first mail
-            var mailframe = $('.extmail').contents();
-            mailframe.find('input[name="id[0]"]').trigger("click");
-            setTimeout(function () {
-                mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
-            }, 20);
-            embedMessage();
         });
     });
 }
-function checkReport() {
+// -------- Check if the report is uploaded successfully(light way) --------
+function lightCheck() {
+    // Check unread mail's counts
+    if (unreadCount() == 0)
+        return false;
+    return true;
+}
+// -------- Check if the report is uploaded successfully(deep way) --------
+function DeepCheck() {
     return __awaiter(this, void 0, void 0, function () {
         var resolve, mailelem, mailtitle, mailtime, regex, maildatetime, reportdatetime;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, getReportUrl()];
+                case 0: return [4 /*yield*/, getReportDetails()];
                 case 1:
                     resolve = _a.sent();
                     reportUrl = resolve[0];
@@ -97,9 +120,6 @@ function checkReport() {
                     mailelem = $('.extmail').contents().find('#MsgListTable td[nowrap]');
                     mailtitle = $('span', mailelem.eq(2)).text();
                     mailtime = $('span', mailelem.eq(4)).text();
-                    // Check unread mail's counts
-                    if (unreadCount() == 0)
-                        return [2 /*return*/, false];
                     // Confirm title contains the following key words
                     if (mailtitle.match(/レポートを受け取りました/) == null)
                         return [2 /*return*/, false];
@@ -123,26 +143,20 @@ function unreadCount() {
         value = '0';
     return parseInt(value);
 }
-function embedMessage() {
-    // Change unread pop
-    var count = unreadCount() - 1;
-    var value = '';
-    if (count > 1)
-        value = count.toString();
-    $('#js-unread-message-count').text(value);
-    $('#top-info').empty();
-    $('#top-info').append('<div class="container"><div class="alert alert-info">' +
-        '<p>レポートが<b>' + reportTime + '</b>にて提出できました．' +
-        '提出したレポートのファイル名は<b>' + reportName + '</b>です．</p>' +
-        '<p>ファイルを<input type="button" id="downloadbtn" value="ダウンロード" class="btn btn-default" ' +
-        'onclick="location.href=\'' + reportUrl + '\'">し，内容を確認できます．</p></div></div>');
+function getReportPageUrl() {
+    var _a;
+    var regex = new RegExp('(.*?/webclass/course.php/.*?/).*');
+    return ((_a = location.href.match(regex)) === null || _a === void 0 ? void 0 : _a[1]) + 'my-reports';
 }
-function getReportUrl() {
+function getMailUrl() {
+    var _a;
+    var regex = new RegExp('(.*?)/webclass/');
+    return ((_a = location.href.match(regex)) === null || _a === void 0 ? void 0 : _a[1]) + '/webclass/msg_editor.php?msgappmode=inbox';
+}
+function getReportDetails() {
     // Get report's url synchronously
     return new Promise(function (resolve) {
-        var _a;
-        var regex = new RegExp('(.*?/webclass/course.php/.*?/).*');
-        var reportpageurl = ((_a = location.href.match(regex)) === null || _a === void 0 ? void 0 : _a[1]) + 'my-reports';
+        var reportpageurl = getReportPageUrl();
         // Create an invisible temp container
         $('body').append('<iframe class="extrepo" style="visibility:hidden;width:0;height:0;border:none;" ' +
             'src="' + reportpageurl + '"></iframe>');
@@ -162,5 +176,70 @@ function getReportUrl() {
                 resolve(['', '', '']);
         });
     });
+}
+function readMail() {
+    // Read the first mail
+    var mailframe = $('.extmail').contents();
+    mailframe.find('input[name="id[0]"]').trigger("click");
+    setTimeout(function () {
+        mailframe.find('input[name="UNSET_UNREADFLAG"]').trigger("click");
+    }, 20);
+    // Change unread pop
+    var count = unreadCount() - 1;
+    var value = '';
+    if (count > 1)
+        value = count.toString();
+    $('#js-unread-message-count').text(value);
+}
+function monitorLoadingStatus() {
+    return __awaiter(this, void 0, void 0, function () {
+        var timeout;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    timeout = 0;
+                    _a.label = 1;
+                case 1:
+                    if (!($('.alert.alert-info').length == 0 && timeout < 30)) return [3 /*break*/, 3];
+                    timeout++;
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 20); })];
+                case 2:
+                    _a.sent();
+                    return [3 /*break*/, 1];
+                case 3:
+                    if ($('.alert.alert-info').length == 0)
+                        return [2 /*return*/, false];
+                    return [2 /*return*/, true];
+            }
+        });
+    });
+}
+function setInfoBox() {
+    if ($('.alert.alert-info').length != 1) {
+        $('#top-info').append('<div class="container"><div class="alert alert-info"></div></div>');
+    }
+}
+function loadingMessage() {
+    setInfoBox();
+    $('.alert.alert-info').html('<p>レポート情報を取得中...</p>');
+}
+function warningMessage() {
+    setInfoBox();
+    $('.alert.alert-info').html('<p><b>レポートが<font color="red">提出されていません</font></b>．' +
+        '<input type="button" id="reportpagebtn" value="マイレポート" class="btn btn-default" ' +
+        'onclick="location.href=\'' + getReportPageUrl() + '\'">ページにてもう一度確認してください．</p>');
+}
+function errorMessage() {
+    setInfoBox();
+    $('.alert.alert-info').html('<p><b>未知の原因により，レポート情報の取得がタイムアウトになりました．</b>' +
+        'レポートの提出状況は<input type="button" id="reportpagebtn" value="マイレポート" class="btn btn-default" ' +
+        'onclick="location.href=\'' + getReportPageUrl() + '\'">ページにて確認できます．</p>');
+}
+function reportDetailMessage() {
+    setInfoBox();
+    $('.alert.alert-info').html('<p>レポートが<b>' + reportTime + '</b>にて提出できました．' +
+        '提出したレポートのファイル名は<b>' + reportName + '</b>です．</p>' +
+        '<p>ファイルを<input type="button" id="downloadbtn" value="ダウンロード" class="btn btn-default" ' +
+        'onclick="location.href=\'' + reportUrl + '\'">し，内容を確認できます．</p>');
 }
 //# sourceMappingURL=reportalert.js.map
