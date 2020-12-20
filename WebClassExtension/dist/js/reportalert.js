@@ -35,9 +35,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var reportName = '';
-var reportUrl = '';
-var reportTime = '';
 $(window).on('load', function () {
     chrome.runtime.sendMessage({ type: 'reportstatus' }, function (response) {
         if (response.has == true)
@@ -46,7 +43,7 @@ $(window).on('load', function () {
 });
 function reportAlert() {
     return __awaiter(this, void 0, void 0, function () {
-        var errtrigger, onetime;
+        var errtrigger, resolve, reportUrl, reportName, reportTime, onetime;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -65,6 +62,12 @@ function reportAlert() {
                     }
                     // Pull error trigger
                     errtrigger.timeCheck(errorMessage);
+                    return [4 /*yield*/, getReportDetails()];
+                case 2:
+                    resolve = _a.sent();
+                    reportUrl = resolve[0];
+                    reportName = resolve[1];
+                    reportTime = resolve[2];
                     // Create an invisible temp container for reading mail contents
                     $('body').append('<iframe class="extmail" style="visibility:hidden;width:0;height:0;border:none;" ' +
                         'src="' + getMailUrl() + '"></iframe>');
@@ -72,7 +75,7 @@ function reportAlert() {
                     $('.extmail').on('load', function () {
                         // The second load event is fired by ('input[name="UNSET_UNREADFLAG"]').trigger("click")
                         // This means the operation is successful.
-                        if (onetime == false) {
+                        if (onetime == false) { // Release resource
                             $('.extmail').remove();
                             $('.extmail').off();
                             // Finished sign
@@ -80,7 +83,7 @@ function reportAlert() {
                             return;
                         }
                         onetime = false;
-                        DeepCheck().then(function (result) {
+                        DeepCheck(reportName, reportTime).then(function (result) {
                             if (result == false) {
                                 $('.extmail').remove();
                                 $('.extmail').off();
@@ -90,7 +93,7 @@ function reportAlert() {
                             }
                             readMail();
                             errtrigger.clearTimeCheck();
-                            reportDetailMessage();
+                            reportDetailMessage(reportName, reportTime, reportUrl);
                         });
                     });
                     return [2 /*return*/];
@@ -106,34 +109,26 @@ function lightCheck() {
     return true;
 }
 // -------- Check if the report is uploaded successfully(deep way) --------
-function DeepCheck() {
+function DeepCheck(reportName, reportTime) {
     return __awaiter(this, void 0, void 0, function () {
-        var resolve, mailelem, mailtitle, mailtime, regex, maildatetime, reportdatetime;
+        var mailelem, mailtitle, mailtime, regex, maildatetime, reportdatetime;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, getReportDetails()];
-                case 1:
-                    resolve = _a.sent();
-                    reportUrl = resolve[0];
-                    reportName = resolve[1];
-                    reportTime = resolve[2];
-                    mailelem = $('.extmail').contents().find('#MsgListTable td[nowrap]');
-                    mailtitle = $('span', mailelem.eq(2)).text();
-                    mailtime = $('span', mailelem.eq(4)).text();
-                    // Confirm title contains the following key words
-                    if (mailtitle.match(/レポートを受け取りました/) == null)
-                        return [2 /*return*/, false];
-                    regex = new RegExp(reportName);
-                    if (mailtitle.match(regex) == null)
-                        return [2 /*return*/, false];
-                    maildatetime = Date.parse('20' + mailtime + ':00');
-                    reportdatetime = Date.parse(reportTime);
-                    if ((maildatetime - reportdatetime) / (1000 * 60) > 3)
-                        return [2 /*return*/, false];
-                    if ((Date.now() - maildatetime) / (1000 * 60) > 10)
-                        return [2 /*return*/, false];
-                    return [2 /*return*/, true];
-            }
+            mailelem = $('.extmail').contents().find('#MsgListTable td[nowrap]');
+            mailtitle = $('span', mailelem.eq(2)).text();
+            mailtime = $('span', mailelem.eq(4)).text();
+            // Confirm title contains the following key words
+            if (mailtitle.match(/レポートを受け取りました/) == null)
+                return [2 /*return*/, false];
+            regex = new RegExp(reportName);
+            if (mailtitle.match(regex) == null)
+                return [2 /*return*/, false];
+            maildatetime = Date.parse('20' + mailtime + ':00');
+            reportdatetime = Date.parse(reportTime);
+            if ((maildatetime - reportdatetime) / (1000 * 60) > 3)
+                return [2 /*return*/, false];
+            if ((Date.now() - maildatetime) / (1000 * 60) > 10)
+                return [2 /*return*/, false];
+            return [2 /*return*/, true];
         });
     });
 }
@@ -235,7 +230,7 @@ function errorMessage() {
         'レポートの提出状況は<input type="button" id="reportpagebtn" value="マイレポート" class="btn btn-default" ' +
         'onclick="location.href=\'' + getReportPageUrl() + '\'">ページにて確認できます．</p>');
 }
-function reportDetailMessage() {
+function reportDetailMessage(reportName, reportTime, reportUrl) {
     setInfoBox();
     $('.alert.alert-info').html('<p>レポートが<b>' + reportTime + '</b>にて提出できました．' +
         '提出したレポートのファイル名は<b>' + reportName + '</b>です．</p>' +

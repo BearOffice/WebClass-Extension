@@ -1,7 +1,3 @@
-let reportName = '';
-let reportUrl = '';
-let reportTime = '';
-
 $(window).on('load', () => {
     chrome.runtime.sendMessage({ type: 'reportstatus' }, response => {
         if (response.has == true) reportAlert();
@@ -24,6 +20,12 @@ async function reportAlert() {
     // Pull error trigger
     errtrigger.timeCheck(errorMessage);
 
+    // Get report detail
+    let resolve = await getReportDetails();
+    let reportUrl = resolve[0];
+    let reportName = resolve[1];
+    let reportTime = resolve[2];
+
     // Create an invisible temp container for reading mail contents
     $('body').append('<iframe class="extmail" style="visibility:hidden;width:0;height:0;border:none;" ' +
         'src="' + getMailUrl() + '"></iframe>');
@@ -33,7 +35,7 @@ async function reportAlert() {
     $('.extmail').on('load', () => {
         // The second load event is fired by ('input[name="UNSET_UNREADFLAG"]').trigger("click")
         // This means the operation is successful.
-        if (onetime == false) {
+        if (onetime == false) { // Release resource
             $('.extmail').remove();
             $('.extmail').off();
 
@@ -43,7 +45,7 @@ async function reportAlert() {
         }
         onetime = false;
 
-        DeepCheck().then(result => {
+        DeepCheck(reportName, reportTime).then(result => {
             if (result == false) {
                 $('.extmail').remove();
                 $('.extmail').off();
@@ -55,7 +57,7 @@ async function reportAlert() {
             readMail();
 
             errtrigger.clearTimeCheck();
-            reportDetailMessage();
+            reportDetailMessage(reportName, reportTime, reportUrl);
         });
     });
 }
@@ -68,12 +70,7 @@ function lightCheck() {
 }
 
 // -------- Check if the report is uploaded successfully(deep way) --------
-async function DeepCheck(): Promise<boolean> {
-    let resolve = await getReportDetails();
-    reportUrl = resolve[0];
-    reportName = resolve[1];
-    reportTime = resolve[2];
-
+async function DeepCheck(reportName: string, reportTime: string): Promise<boolean> {
     let mailelem = $('.extmail').contents().find('#MsgListTable td[nowrap]');
     let mailtitle = $('span', mailelem.eq(2)).text();
     let mailtime = $('span', mailelem.eq(4)).text();
@@ -187,7 +184,7 @@ function errorMessage() {
         'onclick="location.href=\'' + getReportPageUrl() + '\'">ページにて確認できます．</p>');
 }
 
-function reportDetailMessage() {
+function reportDetailMessage(reportName: string, reportTime: string, reportUrl: string) {
     setInfoBox();
     $('.alert.alert-info').html('<p>レポートが<b>' + reportTime + '</b>にて提出できました．' +
         '提出したレポートのファイル名は<b>' + reportName + '</b>です．</p>' +
