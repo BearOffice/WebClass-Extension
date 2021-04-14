@@ -18,7 +18,6 @@ contentsframe.on('load', () => {
         // Regist onclick event   [Option:DOMSubtreeModified propertychange]
         framebody.find('#downloadbtn').on('click', () => {
             let fileurl = framebody.find('a').attr('href');
-            alert("name = " + chaptername);
             chrome.runtime.sendMessage({ type: 'download', filename: chaptername, url: fileurl });
         });
     }
