@@ -1,11 +1,10 @@
 // Initialize
 chrome.runtime.onInstalled.addListener(() => {
-    chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
-
-    // Prevent url not being set
     chrome.storage.sync.get(item => {
-        if (item.url == undefined)
+        if (item.url == undefined){
             chrome.storage.sync.set({ url: '' });
+            chrome.tabs.create({ 'url': 'chrome://extensions/?options=' + chrome.runtime.id });
+        }
     });
 });
 
