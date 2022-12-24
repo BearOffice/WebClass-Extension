@@ -1,3 +1,5 @@
+import { TimeTrigger } from "./timetrigger.js";
+
 // Initialize
 chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.sync.get(item => {
@@ -31,7 +33,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Popup
-chrome.browserAction.onClicked.addListener(() => {
+chrome.action.onClicked.addListener(() => {
     getLoginUrl().then(loginurl => {
         chrome.tabs.create({ url: loginurl }, tab => {
             injectJs(tab);
@@ -41,8 +43,11 @@ chrome.browserAction.onClicked.addListener(() => {
 
 function injectJs(tab: chrome.tabs.Tab) {
     if (tab.id) {
-        chrome.tabs.executeScript(tab.id, { file: "js/jquery-3.5.1.min.js" });
-        chrome.tabs.executeScript(tab.id, { file: "js/autologin.js" });
+        chrome.scripting.executeScript({
+            target: {tabId: tab.id, allFrames: true},
+            files: ["js/jquery-3.6.3.min.js", "js/autologin.js"],
+            world: "MAIN"
+        });
     }
 }
 

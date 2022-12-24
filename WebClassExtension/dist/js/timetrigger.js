@@ -1,4 +1,3 @@
-"use strict";
 var TimeTrigger = /** @class */ (function () {
     function TimeTrigger(time) {
         this.check = setTimeout(function () { }, 0);
@@ -22,4 +21,5 @@ var TimeTrigger = /** @class */ (function () {
     };
     return TimeTrigger;
 }());
+export { TimeTrigger };
 //# sourceMappingURL=timetrigger.js.map

@@ -1,3 +1,5 @@
+import { TimeTrigger } from "./timetrigger";
+
 $(window).on('load', () => {
     chrome.runtime.sendMessage({ type: 'reportstatus' }, response => {
         if (response.has == true) reportAlert();

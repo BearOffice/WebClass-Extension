@@ -1,6 +1,6 @@
 {
   "name": "webclass_extension",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "",
   "main": "js/background.js",
   "scripts": {
@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/chrome": "0.0.126",
-    "@types/jquery": "^3.5.4",
-    "@types/node": "^14.14.10"
+    "@types/chrome": "^0.0.206",
+    "@types/jquery": "^3.5.14",
+    "@types/node": "^18.11.17"
   }
 }

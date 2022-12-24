@@ -1,4 +1,4 @@
-"use strict";
+import { TimeTrigger } from "./timetrigger.js";
 // Initialize
 chrome.runtime.onInstalled.addListener(function () {
     chrome.storage.sync.get(function (item) {
@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 // Popup
-chrome.browserAction.onClicked.addListener(function () {
+chrome.action.onClicked.addListener(function () {
     getLoginUrl().then(function (loginurl) {
         chrome.tabs.create({ url: loginurl }, function (tab) {
             injectJs(tab);
@@ -39,8 +39,11 @@ chrome.browserAction.onClicked.addListener(function () {
 });
 function injectJs(tab) {
     if (tab.id) {
-        chrome.tabs.executeScript(tab.id, { file: "js/jquery-3.5.1.min.js" });
-        chrome.tabs.executeScript(tab.id, { file: "js/autologin.js" });
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id, allFrames: true },
+            files: ["js/jquery-3.6.3.min.js", "js/autologin.js"],
+            world: "MAIN"
+        });
     }
 }
 // Get url synchronously

@@ -1,4 +1,4 @@
-class TimeTrigger {
+export class TimeTrigger {
     private time: number;
     private check = setTimeout(() => { }, 0);
     private single = true;
