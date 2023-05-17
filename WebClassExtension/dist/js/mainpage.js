@@ -39,4 +39,38 @@ $('.course-webclass').html('WebClass&nbsp;&nbsp;' + egg[Math.floor(Math.random()
 //$('.container .row').prepend('<div id="UserTopInfo"><h4 class="page-header"></h4>' +
 //    '<iframe class="extinfo" style="width:100%;height:300;border:none;" ' +
 //    'src=""></iframe></div>');
+// Move year selector down
+var courseTaking = $('div > h3');
+var timeTable = $('form > h4');
+var yeasrAndSemester = $('form > div:nth-child(2)');
+var addCourse = $('form > div:nth-child(7)');
+courseTaking.remove();
+timeTable.remove();
+yeasrAndSemester.remove();
+yeasrAndSemester.insertAfter(addCourse);
+// Delete blank table
+var tables = document.getElementsByTagName('table');
+// Loop through all tables
+for (var i = 0; i < tables.length; i++) {
+    var table = tables[i];
+    // Loop through each row
+    var rows = table.getElementsByTagName('tr');
+    // Loop through each columns
+    for (var j = rows.length - 1; j >= 0; j--) {
+        var row = rows[j];
+        // If all columns 2-7 are empty
+        var isEmpty = true;
+        for (var k = 1; k <= 6; k++) {
+            var cell = row.cells[k];
+            if (cell.textContent && cell.textContent.trim() !== '') {
+                isEmpty = false;
+                break;
+            }
+        }
+        // remove the row
+        if (isEmpty) {
+            table.deleteRow(j);
+        }
+    }
+}
 //# sourceMappingURL=mainpage.js.map

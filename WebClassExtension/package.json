@@ -1,6 +1,6 @@
 {
   "name": "webclass_extension",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "",
   "main": "js/background.js",
   "scripts": {
